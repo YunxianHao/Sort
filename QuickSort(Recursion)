@@ -1,0 +1,99 @@
+There are three methods:
+//Hoare
+int partsort1(int* a, int begin, int end)
+{
+	int left = begin, right = end;
+	int keyi = left;
+	while (left < right)
+	{
+		//Go first on the right and find the small value
+		while (left < right && a[right] >= a[keyi])
+			right--;
+		//Go first on the left and find the big value
+		while (left < right && a[left] <= a[keyi])
+			left++;
+
+		Swap(&a[left], &a[right]);
+	}
+	Swap(&a[keyi], &a[left]);
+	return left;
+}
+//Dig a pit
+int partsort2(int* a, int begin, int end)
+{
+	int key = a[begin];
+	int piti = begin;
+	while (begin < end)
+	{
+		//Find a small one on the right and fill it in the hole on the left
+		while (begin < end && a[end] >= key)
+			end--;
+		a[piti] = a[end];
+		piti = end;
+
+		while (begin < end && a[begin] <= key)
+			begin++;
+		a[piti] = a[begin];
+		piti = begin;
+	}
+	a[piti] = key;
+	return piti;
+}
+//Front and back pointer method
+int partsort3(int* a, int begin, int end)
+{
+	int keyi = begin;
+	int prev = begin;
+	int cur = begin + 1;
+
+	int midi = GetMidIndex(a, begin, end);
+	Swap(&a[keyi], &a[midi]);
+	while (cur <= end)
+	{
+		if (a[cur] < a[keyi])
+		{
+			prev++;
+			Swap(&a[prev], &a[cur]);
+		}
+		cur++;
+	}
+	Swap(&a[keyi], &a[prev]);
+	keyi = prev;
+	return keyi;
+}
+
+
+//Quick sort
+//Recursive big problems, extreme scenarios, the deeper the depth, the easier the stack overflow
+//Solution: 1 Change cycle 2 Simulate with stack
+void QuickSort(int* a,int begin, int end)
+{
+	if (begin >= end)
+	{
+		return;
+	}
+	
+	int keyi = partsort3(a,begin,end);
+	QuickSort(a, begin, keyi - 1);
+	QuickSort(a, keyi + 1, end);
+}
+
+Optimization:
+
+//void QuickSort(int* a, int begin, int end)
+//{
+//	if (begin >= end)
+//	{
+//		return;
+//	}
+//	if (end - begin > 10)
+//	{
+//		int keyi = partsort3(a, begin, end);
+//		QuickSort(a, begin, keyi - 1);
+//		QuickSort(a, keyi + 1, end);
+//	}
+//	else
+//	{
+//		InsertSort(a+begin, end - begin + 1);
+//	}
+//}
