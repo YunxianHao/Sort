@@ -1,0 +1,119 @@
+void QuickSortNonR(int* a, int begin, int end)
+{
+	ST st;
+	StackInit(&st);
+	StackPush(&st,end);
+	StackPush(&st, begin);
+	while (!StackEmpty(&st))
+	{
+		int left = StackTop(&st);
+		StackPop(&st);
+
+		int right = StackTop(&st);
+		StackPop(&st);
+
+		int keyi = partsort3(a, left, right);
+		//[left,	keyi-1] keyi [keyi+1,right]
+		if (keyi + 1 < right)
+		{
+			StackPush(&st, right);
+			StackPush(&st, keyi + 1);
+		}
+
+		if (left < keyi - 1)
+		{
+			StackPush(&st, keyi - 1);
+			StackPush(&st, left);
+		}
+	
+	}
+	StackDestory(&st);
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include<assert.h>
+typedef int STDataType;
+typedef struct Stack
+{
+	STDataType* a;
+	int top;
+	int capacity;
+}ST;
+//
+void StackInit(ST* ps);
+//
+void StackDestory(ST* ps);
+//
+void StackPush(ST* ps, STDataType x);
+//
+void StackPop(ST* ps);
+//
+STDataType StackTop(ST* ps);
+//
+bool StackEmpty(ST* ps);
+//
+int StackSize(ST* ps);
+
+
+
+//Stack
+#include "Stack.h"
+void StackInit(ST* ps)
+{
+	assert(ps);
+	ps->a = NULL;
+	ps->top = 0;
+	ps->capacity = 0;
+}
+void StackDestory(ST* ps)
+{
+	assert(ps);
+	free(ps->a);
+	ps->a = NULL;
+	ps->top = ps->capacity = 0;
+}
+void StackPush(ST* ps, STDataType x)
+{
+	assert(ps);
+	if (ps->top == ps->capacity)
+	{
+		int newCapacity = ps->capacity == 0 ? 4 : ps->capacity * 2;
+		STDataType* tmp = (STDataType*)realloc(ps->a, sizeof(STDataType) * newCapacity);
+		if (tmp == NULL)
+		{
+			printf("Realloc Fail\n");
+			exit(-1);
+		}
+		ps->a = tmp;
+		ps->capacity = newCapacity;
+	}
+	ps->a[ps->top] = x;
+	ps->top++;
+}
+void StackPop(ST* ps)
+{
+	assert(ps);
+	assert(!StackEmpty(ps));
+	ps->top--;
+}
+STDataType StackTop(ST* ps)
+{
+	assert(ps);
+	assert(!StackEmpty(ps));
+
+	return ps->a[ps->top-1];
+}
+bool StackEmpty(ST* ps)
+{
+	assert(ps);
+	
+	return ps->top == 0;
+}
+int StackSize(ST* ps)
+{
+	assert(ps);
+
+	return ps->top;
+}
